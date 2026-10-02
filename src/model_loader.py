@@ -66,7 +66,17 @@ def load_model_artifacts() -> Dict[str, Any]:
 
     # 4. SimpleImputer
     if os.path.exists(IMPUTER_PATH):
-        artifacts["imputer"] = joblib.load(IMPUTER_PATH)
+        imputer = joblib.load(IMPUTER_PATH)
+        # Cross-version compatibility patch for scikit-learn (handles _fill_dtype vs _fit_dtype)
+        fit_dtype = getattr(imputer, "_fit_dtype", None) or getattr(imputer, "_fill_dtype", None)
+        if fit_dtype is None and hasattr(imputer, "statistics_"):
+            fit_dtype = imputer.statistics_.dtype
+        if fit_dtype is None:
+            import numpy as np
+            fit_dtype = np.dtype("float64")
+        imputer._fill_dtype = fit_dtype
+        imputer._fit_dtype = fit_dtype
+        artifacts["imputer"] = imputer
     else:
         missing_files.append(IMPUTER_PATH)
 

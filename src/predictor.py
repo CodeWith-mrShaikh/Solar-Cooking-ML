@@ -84,7 +84,30 @@ def predict_food_temperature(raw_inputs: Dict[str, Any]) -> Dict[str, Any]:
 
     # 5. Transform via SimpleImputer
     # Passing DataFrame with matching columns avoids sklearn feature name mismatch warnings
-    X_imp = imputer.transform(input_df)
+    try:
+        X_imp = imputer.transform(input_df)
+    except Exception:
+        # Cross-version patch for scikit-learn internal attribute differences
+        fit_dtype = getattr(imputer, "_fit_dtype", None) or getattr(imputer, "_fill_dtype", None)
+        if fit_dtype is None and hasattr(imputer, "statistics_"):
+            fit_dtype = imputer.statistics_.dtype
+        if fit_dtype is None:
+            fit_dtype = np.dtype("float64")
+        imputer._fill_dtype = fit_dtype
+        imputer._fit_dtype = fit_dtype
+        try:
+            X_imp = imputer.transform(input_df)
+        except Exception:
+            # Bulletproof fallback: use imputer statistics_ to fill any missing values
+            if hasattr(imputer, "statistics_"):
+                stat_map = dict(zip(feature_order, imputer.statistics_))
+                filled_df = input_df.copy()
+                for c in feature_order:
+                    if filled_df[c].isna().any():
+                        filled_df[c] = filled_df[c].fillna(stat_map.get(c, 0.0))
+                X_imp = filled_df.values
+            else:
+                X_imp = input_df.values
 
     # 6. Transform via StandardScaler
     X_scaled = scaler.transform(X_imp)
