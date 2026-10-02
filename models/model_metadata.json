@@ -1,0 +1,36 @@
+{
+    "model_name": "Extra Trees Regressor",
+    "n_estimators": 100,
+    "random_state": 42,
+    "target": "food_temp_C",
+    "test_split": 0.2,
+    "test_r2": 0.997352,
+    "test_mse": 1.362492,
+    "overfitting_diff": 0.002648,
+    "features": [
+        "time_min",
+        "solar_irradiance_W_m2",
+        "ambient_temp_C",
+        "absorber_temp_C",
+        "mass_kg",
+        "food_matrix",
+        "cooker_type"
+    ],
+    "food_matrix_classes": [
+        "Chamber air (proxy)",
+        "Potato chips",
+        "Rice",
+        "Water",
+        "Water (test medium)",
+        "Water-temperature proxy from Tw"
+    ],
+    "cooker_type_classes": [
+        "Parabolic dish solar cooker",
+        "Thermal storage solar cooker",
+        "box",
+        "panel",
+        "parabolic"
+    ],
+    "dataset_rows": 5803,
+    "dataset_columns": 11
+}

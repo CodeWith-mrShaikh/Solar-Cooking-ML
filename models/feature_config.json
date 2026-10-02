@@ -1,0 +1,21 @@
+{
+    "features": [
+        "time_min",
+        "solar_irradiance_W_m2",
+        "ambient_temp_C",
+        "absorber_temp_C",
+        "mass_kg",
+        "food_matrix",
+        "cooker_type"
+    ],
+    "target": "food_temp_C",
+    "feature_order": [
+        "time_min",
+        "solar_irradiance_W_m2",
+        "ambient_temp_C",
+        "absorber_temp_C",
+        "mass_kg",
+        "food_matrix",
+        "cooker_type"
+    ]
+}
