@@ -231,3 +231,24 @@ Navigate to **📈 EDA Dashboard** to interact with:
   ```bash
   python scripts/validate_model_artifacts.py
   ```
+
+---
+
+## 16. Deployment to Streamlit Community Cloud
+
+This repository is pre-configured for one-click deployment on **Streamlit Community Cloud**:
+1. Push this project to your GitHub repository:
+   ```bash
+   git remote add origin https://github.com/<your-username>/<repo-name>.git
+   git branch -M main
+   git push -u origin main
+   ```
+2. Log into [share.streamlit.io](https://share.streamlit.io) using your GitHub account.
+3. Click **"New app"** (or **"Create app"**).
+4. Configure the deployment settings:
+   - **Repository:** `<your-username>/<repo-name>`
+   - **Branch:** `main`
+   - **Main file path:** `app.py`
+5. Click **"Deploy!"**
+Streamlit Community Cloud automatically reads `requirements.txt` and `.streamlit/config.toml`, builds the container, and provisions your public web URL.
+
