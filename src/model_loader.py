@@ -15,16 +15,28 @@ except ImportError:
     def cache_resource_decorator(func):
         return func
 
-from src.config import (
-    MODEL_PATH,
-    IMPUTER_PATH,
-    SCALER_PATH,
-    FOOD_ENCODER_PATH,
-    COOKER_ENCODER_PATH,
-    FEATURE_CONFIG_PATH,
-    METADATA_PATH,
-    CANONICAL_DATA_PATH
-)
+try:
+    from src.config import (
+        MODEL_PATH,
+        IMPUTER_PATH,
+        SCALER_PATH,
+        FOOD_ENCODER_PATH,
+        COOKER_ENCODER_PATH,
+        FEATURE_CONFIG_PATH,
+        METADATA_PATH,
+        CANONICAL_DATA_PATH
+    )
+except (ImportError, KeyError):
+    from config import (
+        MODEL_PATH,
+        IMPUTER_PATH,
+        SCALER_PATH,
+        FOOD_ENCODER_PATH,
+        COOKER_ENCODER_PATH,
+        FEATURE_CONFIG_PATH,
+        METADATA_PATH,
+        CANONICAL_DATA_PATH
+    )
 
 class ArtifactLoadError(Exception):
     """Custom exception raised when a required model artifact cannot be loaded."""

@@ -13,13 +13,22 @@ except ImportError:
     def cache_data_decorator(func):
         return func
 
-from src.config import (
-    CANONICAL_DATA_PATH,
-    TARGET_COL,
-    NUMERICAL_FEATURES,
-    CATEGORICAL_FEATURES,
-    CANONICAL_FEATURES
-)
+try:
+    from src.config import (
+        CANONICAL_DATA_PATH,
+        TARGET_COL,
+        NUMERICAL_FEATURES,
+        CATEGORICAL_FEATURES,
+        CANONICAL_FEATURES
+    )
+except (ImportError, KeyError):
+    from config import (
+        CANONICAL_DATA_PATH,
+        TARGET_COL,
+        NUMERICAL_FEATURES,
+        CATEGORICAL_FEATURES,
+        CANONICAL_FEATURES
+    )
 
 @cache_data_decorator
 def load_dataset(data_path: str = CANONICAL_DATA_PATH) -> pd.DataFrame:

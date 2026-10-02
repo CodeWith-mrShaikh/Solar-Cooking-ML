@@ -11,8 +11,12 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-from src.config import BENCHMARK_RESULTS, PRODUCTION_EVALUATION, CANONICAL_FEATURES, FEATURE_UI_CONFIG
-from src.model_loader import load_model_artifacts
+try:
+    from src.config import BENCHMARK_RESULTS, PRODUCTION_EVALUATION, CANONICAL_FEATURES, FEATURE_UI_CONFIG
+    from src.model_loader import load_model_artifacts
+except (ImportError, KeyError):
+    from config import BENCHMARK_RESULTS, PRODUCTION_EVALUATION, CANONICAL_FEATURES, FEATURE_UI_CONFIG
+    from model_loader import load_model_artifacts
 
 def render_model_performance():
     st.markdown("<h1 class='main-title'>Model Performance and Evaluation</h1>", unsafe_allow_html=True)

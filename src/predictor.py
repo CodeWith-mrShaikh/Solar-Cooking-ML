@@ -9,20 +9,36 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Tuple
 
-from src.config import (
-    CANONICAL_FEATURES,
-    NUMERICAL_FEATURES,
-    CATEGORICAL_FEATURES,
-    PRODUCTION_EVALUATION
-)
-from src.model_loader import load_model_artifacts
-from src.data_loader import get_feature_ranges
-from src.validation import (
-    validate_numeric_input,
-    validate_categorical_input,
-    check_training_range_warnings,
-    ValidationError
-)
+try:
+    from src.config import (
+        CANONICAL_FEATURES,
+        NUMERICAL_FEATURES,
+        CATEGORICAL_FEATURES,
+        PRODUCTION_EVALUATION
+    )
+    from src.model_loader import load_model_artifacts
+    from src.data_loader import get_feature_ranges
+    from src.validation import (
+        validate_numeric_input,
+        validate_categorical_input,
+        check_training_range_warnings,
+        ValidationError
+    )
+except (ImportError, KeyError):
+    from config import (
+        CANONICAL_FEATURES,
+        NUMERICAL_FEATURES,
+        CATEGORICAL_FEATURES,
+        PRODUCTION_EVALUATION
+    )
+    from model_loader import load_model_artifacts
+    from data_loader import get_feature_ranges
+    from validation import (
+        validate_numeric_input,
+        validate_categorical_input,
+        check_training_range_warnings,
+        ValidationError
+    )
 
 def predict_food_temperature(raw_inputs: Dict[str, Any]) -> Dict[str, Any]:
     """

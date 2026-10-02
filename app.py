@@ -8,17 +8,27 @@ import streamlit as st
 import os
 import sys
 
-# Ensure project root is on sys.path
+# Ensure project root and src directory are on sys.path
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+SRC_DIR = os.path.join(PROJECT_ROOT, "src")
+for p in [PROJECT_ROOT, SRC_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
-from src.model_loader import get_system_status
-from src.views.dashboard_view import render_dashboard
-from src.views.prediction_view import render_prediction
-from src.views.eda_view import render_eda
-from src.views.model_performance_view import render_model_performance
-from src.views.about_view import render_about
+try:
+    from src.model_loader import get_system_status
+    from src.views.dashboard_view import render_dashboard
+    from src.views.prediction_view import render_prediction
+    from src.views.eda_view import render_eda
+    from src.views.model_performance_view import render_model_performance
+    from src.views.about_view import render_about
+except (ImportError, KeyError):
+    from model_loader import get_system_status
+    from views.dashboard_view import render_dashboard
+    from views.prediction_view import render_prediction
+    from views.eda_view import render_eda
+    from views.model_performance_view import render_model_performance
+    from views.about_view import render_about
 
 # ---------------------------------------------------------------------------
 # Page Configuration

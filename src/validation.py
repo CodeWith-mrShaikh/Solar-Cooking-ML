@@ -5,7 +5,10 @@ Ensures numeric sanity, handles physical bounds, and checks against observed tra
 
 import math
 from typing import Dict, Any, List
-from src.config import FEATURE_UI_CONFIG, NUMERICAL_FEATURES
+try:
+    from src.config import FEATURE_UI_CONFIG, NUMERICAL_FEATURES
+except (ImportError, KeyError):
+    from config import FEATURE_UI_CONFIG, NUMERICAL_FEATURES
 
 class ValidationError(Exception):
     """Raised when an input fails critical validity requirements (non-numeric, NaN, inf)."""

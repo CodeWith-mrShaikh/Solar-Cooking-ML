@@ -10,8 +10,12 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-from src.data_loader import load_dataset, get_dataset_kpis, get_run_data
-from src.config import NUMERICAL_FEATURES, TARGET_COL
+try:
+    from src.data_loader import load_dataset, get_dataset_kpis, get_run_data
+    from src.config import NUMERICAL_FEATURES, TARGET_COL
+except (ImportError, KeyError):
+    from data_loader import load_dataset, get_dataset_kpis, get_run_data
+    from config import NUMERICAL_FEATURES, TARGET_COL
 
 def render_eda():
     st.markdown("<h1 class='main-title'>Exploratory Data Analysis (EDA)</h1>", unsafe_allow_html=True)

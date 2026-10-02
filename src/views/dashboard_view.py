@@ -6,8 +6,12 @@ Full Dark & Light mode compatible.
 
 import streamlit as st
 import pandas as pd
-from src.data_loader import get_dataset_kpis
-from src.config import PRODUCTION_EVALUATION
+try:
+    from src.data_loader import get_dataset_kpis
+    from src.config import PRODUCTION_EVALUATION
+except (ImportError, KeyError):
+    from data_loader import get_dataset_kpis
+    from config import PRODUCTION_EVALUATION
 
 def render_dashboard():
     st.markdown("<h1 class='main-title'>Solar Cooking ML Dashboard</h1>", unsafe_allow_html=True)

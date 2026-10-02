@@ -10,10 +10,16 @@ import pandas as pd
 import datetime
 from typing import Dict, Any
 
-from src.config import FEATURE_UI_CONFIG, PRODUCTION_EVALUATION
-from src.model_loader import load_model_artifacts, ArtifactLoadError
-from src.predictor import predict_food_temperature
-from src.validation import ValidationError
+try:
+    from src.config import FEATURE_UI_CONFIG, PRODUCTION_EVALUATION
+    from src.model_loader import load_model_artifacts, ArtifactLoadError
+    from src.predictor import predict_food_temperature
+    from src.validation import ValidationError
+except (ImportError, KeyError):
+    from config import FEATURE_UI_CONFIG, PRODUCTION_EVALUATION
+    from model_loader import load_model_artifacts, ArtifactLoadError
+    from predictor import predict_food_temperature
+    from validation import ValidationError
 
 def render_prediction():
     st.markdown("<h1 class='main-title'>Solar Cooking Food Temperature Predictor</h1>", unsafe_allow_html=True)
