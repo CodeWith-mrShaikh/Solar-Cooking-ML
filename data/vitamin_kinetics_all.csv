@@ -1,0 +1,31 @@
+vitamin,food_source,A_per_min,Ea_J_mol,origin,doi
+Vitamin C,Citrus Fruits,1250000.0,52300.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin C,Leafy Greens,480000000.0,68400.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin C,Root Vegetables,310000.0,45200.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin C,Fruit Juices,8400000.0,58900.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin C,Tubers,920000.0,49100.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin C,McIlvaine buffer,65409.256945,42771.622873,Urvi sheet (fitted from k),10.5281/zenodo.13938958
+Vitamin C,Rosehip nectar,2299592.0,57386.182237,Urvi sheet (fitted from k),10.1590/1678-457X.11417
+Vitamin C,Strawberry nectar,22.95174,22038.543184,Urvi sheet (fitted from k),10.5281/zenodo.13938958
+Vitamin B1,Legumes,210000000000.0,102500.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B1,Whole Grains,150000000.0,75300.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B1,Meats,4300000000.0,85100.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B1,Root Vegetables,18000000000.0,91200.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B1,Dairy Products,620000000.0,79800.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B2,Dairy Products,21000.0,54200.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B2,Cereals,850000.0,61000.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B2,Leafy Greens,11000.0,48700.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B2,Legumes,490000.0,58300.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B5,Dairy Products,350000.0,67400.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B5,Meats,12000000.0,78100.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B5,Whole Grains,180000.0,62800.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B5,Tubers,2400000.0,71500.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B6,Meats,2300000000.0,82400.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B6,Whole Grains,5000000.0,71200.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B6,Tubers,38000000.0,76800.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B6,Legumes,810000000.0,89500.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B6,Chickpea (Cicer arietinum L.),2.734798,21699.218427,Urvi sheet (fitted from k),10.3390/foods13121847
+Vitamin B9,Leafy Greens,1800000.0,64300.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B9,Legumes,640000000.0,88700.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B9,Citrus Fruits,42000.0,56100.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark
+Vitamin B9,Whole Grains,9100000.0,73900.0,"Om sheet (A, Ea given)",Literature / Arrhenius benchmark

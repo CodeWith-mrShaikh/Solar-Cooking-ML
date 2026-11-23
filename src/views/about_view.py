@@ -103,3 +103,40 @@ def render_about():
             * Prediction history is logged for review and exportable as CSV.
             """
         )
+
+    st.markdown("<hr>", unsafe_allow_html=True)
+
+    # ---------------------------------------------------------
+    # Nutrient Degradation Kinetics & PIML Roadmap
+    # ---------------------------------------------------------
+    st.markdown("### Coupled Thermal Kinetics & Physics-Informed ML (PIML) Roadmap")
+
+    p1, p2 = st.columns(2)
+    with p1:
+        st.markdown(
+            r"""
+            #### Thermal Degradation Kinetics Formulation
+            Heat-sensitive micronutrients degrade primarily via irreversible first-order thermal oxidation and hydrolysis:
+            $$\frac{dC(t)}{dt} = -k(T(t)) \cdot C(t)$$
+            
+            Because solar cooking produces time-dependent, non-isothermal temperature profiles $T(t)$, the integrated concentration ratio is given by:
+            $$\ln\left(\frac{C(t)}{C_0}\right) = -\int_0^t k(T(\tau)) \, d\tau$$
+            
+            The reaction rate constant $k(T)$ follows the Arrhenius law:
+            $$k(T) = A \cdot \exp\left(-\frac{E_a}{R \cdot T_K}\right)$$
+            Where $R = 8.314462618\text{ J/(mol}\cdot\text{K)}$ is the universal gas constant, $E_a$ is the activation energy, and $A$ is the collision frequency factor.
+            """
+        )
+
+    with p2:
+        st.markdown(
+            r"""
+            #### Forward Roadmap: Physics-Informed Machine Learning (PIML)
+            Planned for Phase 2 (Dec 2026 – Jan 2027) of the academic timeline:
+            * **Lumped Thermal Capacitance ODE:**
+            $$\rho V C_p \frac{dT_{\text{food}}}{dt} = \eta_0 A_c G(t) - U_L A_L (T_{\text{food}}(t) - T_{\text{ambient}}(t))$$
+            * **Loss Function Regularization:**
+            $$\mathcal{L} = \mathcal{L}_{\text{data}} + \lambda_{\text{phys}} \mathcal{L}_{\text{physics}}$$
+            Where $\mathcal{L}_{\text{physics}}$ penalizes violations of first-law energy conservation and negative kinetic reaction rates, ensuring zero-shot generalizability across novel cooker geometries and geographic coordinates.
+            """
+        )

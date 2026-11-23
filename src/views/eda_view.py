@@ -13,9 +13,11 @@ import plotly.graph_objects as go
 try:
     from src.data_loader import load_dataset, get_dataset_kpis, get_run_data
     from src.config import NUMERICAL_FEATURES, TARGET_COL
+    from src.kinetics import get_all_kinetics_df
 except (ImportError, KeyError):
     from data_loader import load_dataset, get_dataset_kpis, get_run_data
     from config import NUMERICAL_FEATURES, TARGET_COL
+    from kinetics import get_all_kinetics_df
 
 def render_eda():
     st.markdown("<h1 class='main-title'>Exploratory Data Analysis (EDA)</h1>", unsafe_allow_html=True)
@@ -35,12 +37,13 @@ def render_eda():
         return
 
     # Tabs for organized analytics
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "Dataset Overview",
         "Target and Feature Distributions",
         "Correlation Heatmap",
         "Run-Level Time Series",
-        "Food and Cooker Analysis"
+        "Food and Cooker Analysis",
+        "Vitamin Kinetics Data"
     ])
 
     # ---------------------------------------------------------
@@ -310,3 +313,56 @@ def render_eda():
             )
             fig_cooker_temp.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", showlegend=False, margin=dict(l=40, r=40, t=50, b=40))
             st.plotly_chart(fig_cooker_temp, use_container_width=True, theme="streamlit")
+
+    # ---------------------------------------------------------
+    # TAB 6: Vitamin Kinetics Data
+    # ---------------------------------------------------------
+    with tab6:
+        st.markdown("### Vitamin Kinetics Dataset Exploratory Analysis")
+        st.markdown(
+            "Visual analytics on the 30 Arrhenius kinetics parameters and literature datasets "
+            "(`data/vitamin_kinetics.csv` and `data/vitamin_kinetics_all.csv`)."
+        )
+
+        kin_df = get_all_kinetics_df()
+
+        vk_c1, vk_c2 = st.columns(2)
+        with vk_c1:
+            st.markdown("#### Activation Energy (Ea) by Vitamin")
+            fig_ea = px.bar(
+                kin_df,
+                x="food_source",
+                y="Ea_kJ_mol",
+                color="vitamin",
+                barmode="group",
+                title="Arrhenius Activation Energy Ea (kJ/mol) Across Food Matrices",
+                labels={"Ea_kJ_mol": "Activation Energy (kJ/mol)", "food_source": "Food Matrix", "vitamin": "Vitamin"}
+            )
+            fig_ea.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=40, r=40, t=50, b=40),
+                legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5)
+            )
+            st.plotly_chart(fig_ea, use_container_width=True)
+
+        with vk_c2:
+            st.markdown("#### Reaction Rate k at 80°C Benchmark")
+            fig_k80 = px.bar(
+                kin_df.sort_values("k_at_80C_per_min", ascending=False),
+                x="food_source",
+                y="k_at_80C_per_min",
+                color="vitamin",
+                title="Reaction Rate Constant k(80°C) [min⁻¹]",
+                labels={"k_at_80C_per_min": "Rate Constant k at 80°C (min⁻¹)", "food_source": "Food Matrix", "vitamin": "Vitamin"}
+            )
+            fig_k80.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=40, r=40, t=50, b=40),
+                legend=dict(orientation="h", yanchor="bottom", y=-0.4, xanchor="center", x=0.5)
+            )
+            st.plotly_chart(fig_k80, use_container_width=True)
+
+        st.markdown("#### Kinetics Dataset Inspection")
+        st.dataframe(kin_df[["vitamin", "food_source", "A_per_min", "Ea_kJ_mol", "k_at_80C_per_min", "origin", "doi"]], use_container_width=True)

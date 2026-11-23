@@ -114,12 +114,17 @@ def load_model_artifacts() -> Dict[str, Any]:
 
 def get_system_status() -> Dict[str, Any]:
     """
-    Checks availability of dataset, model, and preprocessing artifacts
+    Checks availability of dataset, model, preprocessing artifacts, and vitamin kinetics
     without raising exceptions. Used for sidebar system status badges.
     """
+    data_dir = os.path.dirname(CANONICAL_DATA_PATH)
+    kinetics_csv = os.path.join(data_dir, "vitamin_kinetics.csv")
+    kinetics_all_csv = os.path.join(data_dir, "vitamin_kinetics_all.csv")
+
     status = {
         "dataset_loaded": os.path.exists(CANONICAL_DATA_PATH),
         "model_loaded": os.path.exists(MODEL_PATH),
+        "kinetics_loaded": os.path.exists(kinetics_csv) or os.path.exists(kinetics_all_csv),
         "preprocessing_loaded": (
             os.path.exists(IMPUTER_PATH) and
             os.path.exists(SCALER_PATH) and
@@ -135,6 +140,8 @@ def get_system_status() -> Dict[str, Any]:
         status["missing_items"].append("data/final_training_dataset.csv")
     if not status["model_loaded"]:
         status["missing_items"].append("models/extra_trees_model.joblib")
+    if not status["kinetics_loaded"]:
+        status["missing_items"].append("data/vitamin_kinetics.csv")
     if not os.path.exists(IMPUTER_PATH):
         status["missing_items"].append("models/imputer.joblib")
     if not os.path.exists(SCALER_PATH):

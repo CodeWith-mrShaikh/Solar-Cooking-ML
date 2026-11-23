@@ -19,6 +19,7 @@ try:
     from src.model_loader import get_system_status
     from src.views.dashboard_view import render_dashboard
     from src.views.prediction_view import render_prediction
+    from src.views.vitamin_view import render_vitamin_kinetics
     from src.views.eda_view import render_eda
     from src.views.model_performance_view import render_model_performance
     from src.views.about_view import render_about
@@ -26,6 +27,7 @@ except (ImportError, KeyError):
     from model_loader import get_system_status
     from views.dashboard_view import render_dashboard
     from views.prediction_view import render_prediction
+    from views.vitamin_view import render_vitamin_kinetics
     from views.eda_view import render_eda
     from views.model_performance_view import render_model_performance
     from views.about_view import render_about
@@ -318,6 +320,7 @@ with st.sidebar:
     NAV_ITEMS = [
         ("Dashboard", "dashboard"),
         ("Prediction", "prediction"),
+        ("Nutrient Kinetics", "vitamin_kinetics"),
         ("EDA Dashboard", "eda"),
         ("Model Performance", "model_performance"),
         ("About and Science", "about")
@@ -338,7 +341,7 @@ with st.sidebar:
     # 1. Dataset Status
     if status["dataset_loaded"]:
         st.markdown(
-            "<div class='status-badge status-ok'><span>Dataset</span><span>Loaded</span></div>",
+            "<div class='status-badge status-ok'><span>Dataset</span><span>Loaded (5,803 rows)</span></div>",
             unsafe_allow_html=True
         )
     else:
@@ -350,19 +353,31 @@ with st.sidebar:
     # 2. Model Status
     if status["model_loaded"]:
         st.markdown(
-            "<div class='status-badge status-ok'><span>Model</span><span>Loaded</span></div>",
+            "<div class='status-badge status-ok'><span>Solar Model</span><span>Loaded (99.74% R²)</span></div>",
             unsafe_allow_html=True
         )
     else:
         st.markdown(
-            "<div class='status-badge status-missing'><span>Model</span><span>Missing</span></div>",
+            "<div class='status-badge status-missing'><span>Solar Model</span><span>Missing</span></div>",
             unsafe_allow_html=True
         )
 
-    # 3. Preprocessing Status
+    # 3. Nutrient Kinetics Status
+    if status.get("kinetics_loaded", False):
+        st.markdown(
+            "<div class='status-badge status-ok'><span>Nutrient Kinetics</span><span>Loaded (30 entries)</span></div>",
+            unsafe_allow_html=True
+        )
+    else:
+        st.markdown(
+            "<div class='status-badge status-missing'><span>Nutrient Kinetics</span><span>Missing</span></div>",
+            unsafe_allow_html=True
+        )
+
+    # 4. Preprocessing Status
     if status["preprocessing_loaded"]:
         st.markdown(
-            "<div class='status-badge status-ok'><span>Preprocessing</span><span>Loaded</span></div>",
+            "<div class='status-badge status-ok'><span>Preprocessing</span><span>Ready</span></div>",
             unsafe_allow_html=True
         )
     else:
@@ -383,7 +398,7 @@ with st.sidebar:
         """
         <div style='font-size: 0.75rem; color: inherit; opacity: 0.75; text-align: left; line-height: 1.5;'>
             <b>Academic EPICS Project</b><br>
-            Production Extra Trees Regressor<br>
+            Production Extra Trees + Arrhenius Kinetics<br>
             Validation R²: 99.74% (80:20 Split)
         </div>
         """,
@@ -399,6 +414,8 @@ if selected_page == "Dashboard":
     render_dashboard()
 elif selected_page == "Prediction":
     render_prediction()
+elif selected_page == "Nutrient Kinetics":
+    render_vitamin_kinetics()
 elif selected_page == "EDA Dashboard":
     render_eda()
 elif selected_page == "Model Performance":

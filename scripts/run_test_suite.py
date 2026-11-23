@@ -36,7 +36,14 @@ from src.validation import (
     check_training_range_warnings,
     ValidationError
 )
-from src.predictor import predict_food_temperature
+from src.predictor import predict_food_temperature, predict_solar_cooking_and_nutrients
+from src.kinetics import (
+    get_all_kinetics_df,
+    get_available_vitamins,
+    get_food_sources_for_vitamin,
+    calculate_arrhenius_k,
+    simulate_vitamin_degradation
+)
 
 class TestSolarCookingSystem(unittest.TestCase):
 
@@ -191,6 +198,44 @@ class TestSolarCookingSystem(unittest.TestCase):
             self.assertNotIn("confidence", [k.lower() for k in bench.keys()])
         self.assertAlmostEqual(PRODUCTION_EVALUATION["test_r2"], 0.997352, places=6)
         self.assertAlmostEqual(PRODUCTION_EVALUATION["test_mse"], 1.362492, places=6)
+
+    def test_12_vitamin_kinetics_library(self):
+        """Verify that all 30 vitamin kinetics entries and 6 vitamins load correctly."""
+        vits = get_available_vitamins()
+        self.assertEqual(len(vits), 6, f"Expected 6 vitamins, got {len(vits)}")
+        for v in ["Vitamin C", "Vitamin B1", "Vitamin B2", "Vitamin B5", "Vitamin B6", "Vitamin B9"]:
+            self.assertIn(v, vits)
+
+        kin_df = get_all_kinetics_df()
+        self.assertEqual(len(kin_df), 30, f"Expected 30 kinetic entries, got {len(kin_df)}")
+        self.assertTrue((kin_df["A_per_min"] > 0).all(), "All A factors must be positive")
+        self.assertTrue((kin_df["Ea_J_mol"] > 0).all(), "All Ea values must be positive")
+
+    def test_13_arrhenius_monotonicity(self):
+        """Verify that k(T) increases strictly with temperature."""
+        temps = np.array([40.0, 60.0, 80.0, 100.0])
+        k_vals = calculate_arrhenius_k(temps, A_per_min=1.25e6, Ea_J_mol=52300.0)
+        self.assertTrue(np.all(np.diff(k_vals) > 0), "Reaction rate constant k must strictly increase with temperature")
+
+    def test_14_merged_simulation(self):
+        """Verify the coupled Solar ML + Arrhenius simulation pipeline."""
+        raw_input = {
+            "time_min": 30.0,
+            "solar_irradiance_W_m2": 600.0,
+            "ambient_temp_C": 28.0,
+            "absorber_temp_C": 80.0,
+            "mass_kg": 0.5,
+            "food_matrix": "Rice",
+            "cooker_type": "Parabolic dish solar cooker"
+        }
+        res = predict_solar_cooking_and_nutrients(raw_input, vitamin="Vitamin C", food_source="Citrus Fruits")
+        self.assertIn("predicted_food_temp_C", res)
+        self.assertIn("final_retention_percent", res)
+        self.assertIn("final_degradation_percent", res)
+        self.assertGreaterEqual(res["final_retention_percent"], 0.0)
+        self.assertLessEqual(res["final_retention_percent"], 100.0)
+        self.assertAlmostEqual(res["final_retention_percent"] + res["final_degradation_percent"], 100.0, places=1)
+        self.assertEqual(len(res["times_min"]), 31)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

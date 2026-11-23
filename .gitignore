@@ -24,6 +24,10 @@ htmlcov/
 Thumbs.db
 desktop.ini
 
-# Scratch / Logs
+# Scratch / Logs / Dumps
 *.log
 scratch/
+colab_cells_dump.txt
+colab_raw.html
+colab_script.txt
+downloaded_colab.ipynb
