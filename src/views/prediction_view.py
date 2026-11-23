@@ -22,7 +22,9 @@ try:
     from src.kinetics import (
         get_available_vitamins,
         get_food_sources_for_vitamin,
-        get_kinetics_entry
+        get_kinetics_entry,
+        FOOD_SOURCE_METADATA,
+        SOLAR_FOOD_METADATA
     )
     from src.validation import ValidationError
 except (ImportError, KeyError):
@@ -32,7 +34,9 @@ except (ImportError, KeyError):
     from kinetics import (
         get_available_vitamins,
         get_food_sources_for_vitamin,
-        get_kinetics_entry
+        get_kinetics_entry,
+        FOOD_SOURCE_METADATA,
+        SOLAR_FOOD_METADATA
     )
     from validation import ValidationError
 
@@ -158,6 +162,7 @@ def render_prediction():
             label="Solar Food Matrix",
             options=food_options,
             index=food_idx,
+            format_func=lambda x: SOLAR_FOOD_METADATA.get(x, x),
             help="Food substrate or surrogate medium tested in physical solar cooker runs",
             key="input_food_matrix"
         )
@@ -195,19 +200,25 @@ def render_prediction():
             label="Kinetics Food Matrix / Substrate",
             options=available_sources,
             index=src_idx,
+            format_func=lambda x: FOOD_SOURCE_METADATA.get(x, {}).get("label", x),
             help="Biological food matrix or buffer system from which Arrhenius parameters (A, Ea) are derived",
             key="input_vitamin_source"
         )
 
-        # Show kinetic constants preview
+        # Show kinetic constants preview and dietary examples
         k_entry = get_kinetics_entry(selected_vitamin, selected_source)
+        src_meta = FOOD_SOURCE_METADATA.get(selected_source, {})
+        example_str = src_meta.get("examples", "Standard dietary source")
+        desc_str = src_meta.get("description", "")
+
         st.markdown(
             f"""
             <div style='background-color: rgba(128, 128, 128, 0.08); border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 0.85rem;'>
-                <b>Kinetic Parameters:</b><br>
+                <b>Kinetic Parameters ({selected_source}):</b><br>
+                • Example Foods: <span style='color: #3b82f6; font-weight: 600;'>{example_str}</span><br>
                 • Frequency Factor <i>A</i>: <code class='code-highlight'>{k_entry['A_per_min']:.2e} min⁻¹</code><br>
                 • Activation Energy <i>Ea</i>: <code class='code-highlight'>{k_entry['Ea_J_mol']/1000.0:.2f} kJ/mol</code><br>
-                • Literature Source: <span style='opacity: 0.85;'>{k_entry['origin']}</span>
+                • Context: <span style='opacity: 0.85;'>{desc_str}</span>
             </div>
             """,
             unsafe_allow_html=True

@@ -134,12 +134,13 @@ def render_vitamin_kinetics():
             filtered_df = filtered_df[filtered_df["vitamin"] == selected_vit_filter]
 
         display_cols = [
-            "vitamin", "food_source", "A_per_min", "Ea_kJ_mol",
+            "vitamin", "food_source", "example_foods", "A_per_min", "Ea_kJ_mol",
             "k_at_80C_per_min", "half_life_at_80C_min", "origin", "doi"
         ]
         col_rename = {
             "vitamin": "Vitamin",
             "food_source": "Food Matrix / Substrate",
+            "example_foods": "Example Foods (e.g. Potato, Rice)",
             "A_per_min": "A (min⁻¹)",
             "Ea_kJ_mol": "Ea (kJ/mol)",
             "k_at_80C_per_min": "k at 80°C (min⁻¹)",

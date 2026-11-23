@@ -60,6 +60,89 @@ KINETICS_REGISTRY: List[Dict[str, Any]] = [
     {"vitamin": "Vitamin B9", "food_source": "Whole Grains", "A_per_min": 9.10e6, "Ea_J_mol": 73900.0, "origin": "Om sheet (A, Ea given)", "doi": "Literature / Arrhenius benchmark", "t_min_C": 50.0, "t_max_C": 100.0}
 ]
 
+# Descriptive metadata and real-world dietary examples for each kinetics food matrix
+FOOD_SOURCE_METADATA: Dict[str, Dict[str, str]] = {
+    "Tubers": {
+        "label": "Tubers (Potato, Cassava, Yam)",
+        "examples": "Potato, Cassava, Yam, Sweet Potato",
+        "description": "Starchy underground stem tubers rich in Vitamin C, B5, and B6."
+    },
+    "Root Vegetables": {
+        "label": "Root Vegetables (Carrots, Beetroot, Radish)",
+        "examples": "Carrots, Beetroot, Radish, Turnips",
+        "description": "Underground taproots rich in dietary fiber, Vitamin C, and B1 (Thiamine)."
+    },
+    "Whole Grains": {
+        "label": "Whole Grains (Rice, Wheat, Oats)",
+        "examples": "Rice, Wheat, Oats, Barley, Brown Rice",
+        "description": "Intact grain kernels with germ and bran intact, major source of B-vitamins."
+    },
+    "Legumes": {
+        "label": "Legumes (Beans, Lentils, Peas)",
+        "examples": "Chickpeas, Lentils (Dal), Black beans, Soybeans, Peas",
+        "description": "High-protein pulse crops containing thiamine, riboflavin, B6, and folates."
+    },
+    "Chickpea (Cicer arietinum L.)": {
+        "label": "Chickpea (Cicer arietinum L. / Chana)",
+        "examples": "Garbanzo beans, Bengal gram, Kabuli chana",
+        "description": "High-protein legume studied specifically in domestic cooking kinetics for Vitamin B6."
+    },
+    "Citrus Fruits": {
+        "label": "Citrus Fruits (Orange, Lemon, Lime)",
+        "examples": "Orange, Lemon, Lime, Grapefruit, Amla",
+        "description": "Acidic fruits containing high natural ascorbic acid (Vitamin C) and folates."
+    },
+    "Leafy Greens": {
+        "label": "Leafy Greens (Spinach, Kale, Fenugreek)",
+        "examples": "Spinach (Palak), Kale, Fenugreek (Methi), Cabbage",
+        "description": "Tender green vegetables with high heat susceptibility for Vitamin C, B2, and B9."
+    },
+    "Fruit Juices": {
+        "label": "Fruit Juices (Apple, Orange, Berry Juices)",
+        "examples": "Apple juice, Orange juice, Grape juice",
+        "description": "Liquid fruit substrates where heat transfer is convective."
+    },
+    "Cereals": {
+        "label": "Cereals (Corn, Millets, Sorghum)",
+        "examples": "Corn (Maize), Sorghum (Jowar), Pearl millet (Bajra)",
+        "description": "Staple cereal grains providing dietary riboflavin (B2)."
+    },
+    "Dairy Products": {
+        "label": "Dairy Products (Milk, Yogurt)",
+        "examples": "Cow milk, Buffalo milk, Yogurt, Whey",
+        "description": "Liquid and semi-solid dairy containing thiamine, riboflavin, and pantothenic acid."
+    },
+    "Meats": {
+        "label": "Meats (Poultry, Fish, Beef)",
+        "examples": "Chicken, Fish, Mutton, Beef",
+        "description": "Animal protein tissue rich in B1, B5, and B6."
+    },
+    "McIlvaine buffer": {
+        "label": "McIlvaine buffer (pH 3–7 Aqueous Standard)",
+        "examples": "Citrate-phosphate laboratory buffer",
+        "description": "Controlled ionic strength aqueous model system for isolated ascorbic acid oxidation."
+    },
+    "Rosehip nectar": {
+        "label": "Rosehip nectar (Rosa canina Extract)",
+        "examples": "Rosehip juice/puree beverage",
+        "description": "Ultra-rich natural ascorbic acid substrate tested across 70°C–95°C thermal pasteurization."
+    },
+    "Strawberry nectar": {
+        "label": "Strawberry nectar (Fragaria ananassa)",
+        "examples": "Strawberry beverage puree",
+        "description": "Berry juice system with active anthocyanin pigments and high Vitamin C content."
+    }
+}
+
+SOLAR_FOOD_METADATA: Dict[str, str] = {
+    "Potato chips": "Potato chips (Tuber / Root Matrix)",
+    "Rice": "Rice (Whole Grain / Cereal Matrix)",
+    "Water": "Water (Aqueous Standard)",
+    "Water (test medium)": "Water (Standard Solar Test Medium)",
+    "Chamber air (proxy)": "Chamber air (Cavity Air Proxy)",
+    "Water-temperature proxy from Tw": "Water-temperature proxy from Tw (Thermocouple Proxy)"
+}
+
 # Quick mapping dictionary for fast lookup: (vitamin, food_source) -> params
 KINETICS_MAP: Dict[Tuple[str, str], Dict[str, Any]] = {
     (entry["vitamin"], entry["food_source"]): entry for entry in KINETICS_REGISTRY
@@ -180,8 +263,8 @@ def simulate_vitamin_degradation(
         matrix_match = (
             solar_lower in source_lower
             or source_lower in solar_lower
-            or (solar_lower == "rice" and "grain" in source_lower)
-            or (solar_lower == "potato chips" and "tuber" in source_lower)
+            or (solar_lower == "rice" and ("grain" in source_lower or "cereal" in source_lower))
+            or (("potato" in solar_lower) and ("tuber" in source_lower or "root" in source_lower))
         )
 
     # Compile minute-by-minute timeline DataFrame
@@ -231,6 +314,7 @@ def get_all_kinetics_df() -> pd.DataFrame:
     """Returns the full 30-entry kinetics parameters registry as a formatted DataFrame."""
     df = pd.DataFrame(KINETICS_REGISTRY).copy()
     df["Ea_kJ_mol"] = (df["Ea_J_mol"] / 1000.0).round(2)
+    df["example_foods"] = df["food_source"].map(lambda s: FOOD_SOURCE_METADATA.get(s, {}).get("examples", "Standard dietary food"))
     # Calculate k at reference temperature 80 °C (353.15 K) for easy comparative ranking
     df["k_at_80C_per_min"] = df.apply(
         lambda r: calculate_arrhenius_k(np.array([80.0]), r["A_per_min"], r["Ea_J_mol"])[0],
