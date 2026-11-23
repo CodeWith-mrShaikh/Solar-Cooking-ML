@@ -15,8 +15,11 @@ try:
     from src.kinetics import (
         get_all_kinetics_df,
         get_available_vitamins,
+        get_all_food_sources,
+        get_vitamins_for_food_source,
         get_food_sources_for_vitamin,
         calculate_arrhenius_k,
+        FOOD_SOURCE_METADATA,
         R_GAS_CONSTANT,
         CELSIUS_TO_KELVIN
     )
@@ -24,8 +27,11 @@ except (ImportError, KeyError):
     from kinetics import (
         get_all_kinetics_df,
         get_available_vitamins,
+        get_all_food_sources,
+        get_vitamins_for_food_source,
         get_food_sources_for_vitamin,
         calculate_arrhenius_k,
+        FOOD_SOURCE_METADATA,
         R_GAS_CONSTANT,
         CELSIUS_TO_KELVIN
     )
@@ -121,17 +127,27 @@ def render_vitamin_kinetics():
             "compiled from literature (Om literature benchmarks) and experimental reported kinetics (Urvi Zenodo datasets)."
         )
 
-        f_col1, f_col2 = st.columns([1, 2])
+        f_col1, f_col2 = st.columns([1, 1])
         with f_col1:
             selected_vit_filter = st.selectbox(
                 "Filter by Vitamin:",
                 options=["All Vitamins"] + vitamins_list,
                 key="filter_vit_tab1"
             )
+        with f_col2:
+            all_food_sources = get_all_food_sources()
+            selected_source_filter = st.selectbox(
+                "Filter by Food Matrix (All 14 Substrates):",
+                options=["All 14 Food Matrices"] + all_food_sources,
+                format_func=lambda x: "All 14 Food Matrices" if x == "All 14 Food Matrices" else FOOD_SOURCE_METADATA.get(x, {}).get("label", x),
+                key="filter_source_tab1"
+            )
 
         filtered_df = df_kinetics.copy()
         if selected_vit_filter != "All Vitamins":
             filtered_df = filtered_df[filtered_df["vitamin"] == selected_vit_filter]
+        if selected_source_filter != "All 14 Food Matrices":
+            filtered_df = filtered_df[filtered_df["food_source"] == selected_source_filter]
 
         display_cols = [
             "vitamin", "food_source", "example_foods", "A_per_min", "Ea_kJ_mol",
@@ -233,12 +249,18 @@ def render_vitamin_kinetics():
 
         r_col1, r_col2 = st.columns(2)
         with r_col1:
-            sel_vit = st.selectbox("Select Vitamin:", options=vitamins_list, key="rate_vit")
+            all_matrices = get_all_food_sources()
+            sel_source = st.selectbox(
+                "Select Food Matrix (All 14 Substrates):",
+                options=all_matrices,
+                format_func=lambda x: FOOD_SOURCE_METADATA.get(x, {}).get("label", x),
+                key="rate_source"
+            )
         with r_col2:
-            sources = get_food_sources_for_vitamin(sel_vit)
-            if "rate_source" in st.session_state and st.session_state["rate_source"] not in sources:
-                st.session_state["rate_source"] = sources[0]
-            sel_source = st.selectbox("Select Food Matrix:", options=sources, key="rate_source")
+            avail_vits = get_vitamins_for_food_source(sel_source)
+            if "rate_vit" in st.session_state and st.session_state["rate_vit"] not in avail_vits:
+                st.session_state["rate_vit"] = avail_vits[0]
+            sel_vit = st.selectbox("Select Vitamin Target:", options=avail_vits, key="rate_vit")
 
         sub_df = df_kinetics[(df_kinetics["vitamin"] == sel_vit) & (df_kinetics["food_source"] == sel_source)]
         entry = sub_df.iloc[0] if not sub_df.empty else df_kinetics.iloc[0]

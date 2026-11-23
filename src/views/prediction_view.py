@@ -21,6 +21,8 @@ try:
     from src.predictor import predict_solar_cooking_and_nutrients
     from src.kinetics import (
         get_available_vitamins,
+        get_all_food_sources,
+        get_vitamins_for_food_source,
         get_food_sources_for_vitamin,
         get_kinetics_entry,
         FOOD_SOURCE_METADATA,
@@ -33,6 +35,8 @@ except (ImportError, KeyError):
     from predictor import predict_solar_cooking_and_nutrients
     from kinetics import (
         get_available_vitamins,
+        get_all_food_sources,
+        get_vitamins_for_food_source,
         get_food_sources_for_vitamin,
         get_kinetics_entry,
         FOOD_SOURCE_METADATA,
@@ -69,6 +73,7 @@ def render_prediction():
         return
 
     # Available vitamins and food sources
+    all_sources = get_all_food_sources()
     vitamins_list = get_available_vitamins()
 
     # Initialize session state for prediction history and form inputs
@@ -81,10 +86,10 @@ def render_prediction():
         "ambient_temp_C": FEATURE_UI_CONFIG["ambient_temp_C"]["default"],
         "absorber_temp_C": FEATURE_UI_CONFIG["absorber_temp_C"]["default"],
         "mass_kg": FEATURE_UI_CONFIG["mass_kg"]["default"],
-        "food_matrix": "Rice" if "Rice" in food_options else food_options[0],
+        "food_matrix": "Potato chips" if "Potato chips" in food_options else ("Rice" if "Rice" in food_options else food_options[0]),
         "cooker_type": "Thermal storage solar cooker" if "Thermal storage solar cooker" in cooker_options else cooker_options[0],
-        "vitamin": "Vitamin C",
-        "vitamin_source": "Citrus Fruits"
+        "vitamin_source": "Tubers",
+        "vitamin": "Vitamin C"
     }
 
     # Reset trigger handler
@@ -179,30 +184,49 @@ def render_prediction():
 
     with col3:
         st.markdown("#### 3. Nutrient Degradation Target")
+        st.caption("Couples the ML transient heating curve with Arrhenius kinetic parameters.")
 
-        curr_vit = st.session_state.get("input_vitamin", defaults["vitamin"])
-        vit_idx = vitamins_list.index(curr_vit) if curr_vit in vitamins_list else 0
-        selected_vitamin = st.selectbox(
-            label="Heat-Sensitive Vitamin",
-            options=vitamins_list,
-            index=vit_idx,
-            help="Select the specific vitamin target for kinetic degradation simulation",
-            key="input_vitamin"
+        # Educational help badge for food sources
+        st.markdown(
+            """
+            <div style='background-color: rgba(59, 130, 246, 0.08); border-left: 3px solid #3b82f6; border-radius: 4px; padding: 6px 10px; margin-bottom: 12px; font-size: 0.8rem;'>
+                💡 <b>Food Source Guide:</b> <b>Potato</b> is classified under <b>Tubers</b> (along with Cassava & Yam). 
+                Taproots (Carrots, Beetroot, Radish) are under <b>Root Vegetables</b>. All <b>14</b> biological substrates are selectable below.
+            </div>
+            """,
+            unsafe_allow_html=True
         )
 
-        available_sources = get_food_sources_for_vitamin(selected_vitamin)
-        if "input_vitamin_source" in st.session_state and st.session_state["input_vitamin_source"] not in available_sources:
-            st.session_state["input_vitamin_source"] = available_sources[0]
+        # 1. Kinetics Food Matrix / Substrate (ALL 14 SUBSTRATES UNCONDITIONALLY AVAILABLE)
+        curr_src = st.session_state.get("input_vitamin_source", defaults["vitamin_source"])
+        if curr_src not in all_sources:
+            curr_src = all_sources[0]
+            st.session_state["input_vitamin_source"] = curr_src
 
-        curr_src = st.session_state.get("input_vitamin_source", available_sources[0])
-        src_idx = available_sources.index(curr_src) if curr_src in available_sources else 0
+        src_idx = all_sources.index(curr_src)
         selected_source = st.selectbox(
-            label="Kinetics Food Matrix / Substrate",
-            options=available_sources,
+            label="Kinetics Food Matrix / Substrate (All 14 Substrates)",
+            options=all_sources,
             index=src_idx,
             format_func=lambda x: FOOD_SOURCE_METADATA.get(x, {}).get("label", x),
-            help="Biological food matrix or buffer system from which Arrhenius parameters (A, Ea) are derived",
+            help="Select from all 14 biological food matrices and buffer substrates (literature & Zenodo datasets)",
             key="input_vitamin_source"
+        )
+
+        # 2. Heat-Sensitive Vitamin (Dynamically shows vitamins available in this selected food matrix)
+        available_vitamins = get_vitamins_for_food_source(selected_source)
+        curr_vit = st.session_state.get("input_vitamin", available_vitamins[0])
+        if curr_vit not in available_vitamins:
+            curr_vit = available_vitamins[0]
+            st.session_state["input_vitamin"] = curr_vit
+
+        vit_idx = available_vitamins.index(curr_vit)
+        selected_vitamin = st.selectbox(
+            label="Heat-Sensitive Vitamin",
+            options=available_vitamins,
+            index=vit_idx,
+            help=f"Vitamins with empirical Arrhenius kinetics in {selected_source}",
+            key="input_vitamin"
         )
 
         # Show kinetic constants preview and dietary examples
@@ -210,12 +234,14 @@ def render_prediction():
         src_meta = FOOD_SOURCE_METADATA.get(selected_source, {})
         example_str = src_meta.get("examples", "Standard dietary source")
         desc_str = src_meta.get("description", "")
+        all_vits_in_matrix = ", ".join(available_vitamins)
 
         st.markdown(
             f"""
             <div style='background-color: rgba(128, 128, 128, 0.08); border-radius: 8px; padding: 12px; margin-top: 15px; font-size: 0.85rem;'>
                 <b>Kinetic Parameters ({selected_source}):</b><br>
                 • Example Foods: <span style='color: #3b82f6; font-weight: 600;'>{example_str}</span><br>
+                • Target Nutrient: <span style='color: #10b981; font-weight: 600;'>{selected_vitamin}</span> (of [{all_vits_in_matrix}])<br>
                 • Frequency Factor <i>A</i>: <code class='code-highlight'>{k_entry['A_per_min']:.2e} min⁻¹</code><br>
                 • Activation Energy <i>Ea</i>: <code class='code-highlight'>{k_entry['Ea_J_mol']/1000.0:.2f} kJ/mol</code><br>
                 • Context: <span style='opacity: 0.85;'>{desc_str}</span>

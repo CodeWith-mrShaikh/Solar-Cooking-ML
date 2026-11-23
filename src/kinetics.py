@@ -63,80 +63,80 @@ KINETICS_REGISTRY: List[Dict[str, Any]] = [
 # Descriptive metadata and real-world dietary examples for each kinetics food matrix
 FOOD_SOURCE_METADATA: Dict[str, Dict[str, str]] = {
     "Tubers": {
-        "label": "Tubers (Potato, Cassava, Yam)",
-        "examples": "Potato, Cassava, Yam, Sweet Potato",
-        "description": "Starchy underground stem tubers rich in Vitamin C, B5, and B6."
+        "label": "Tubers (Potato, Cassava, Yam - Root / Tuber Source)",
+        "examples": "Potato (Root Tuber), Cassava, Yam, Sweet Potato",
+        "description": "Starchy underground stem tubers and root sources rich in Vitamin C, B5, and B6."
     },
     "Root Vegetables": {
-        "label": "Root Vegetables (Carrots, Beetroot, Radish)",
-        "examples": "Carrots, Beetroot, Radish, Turnips",
+        "label": "Root Vegetables (Carrots, Beetroot, Radish - Root Source)",
+        "examples": "Carrots, Beetroot, Radish, Turnips (Taproot Vegetables)",
         "description": "Underground taproots rich in dietary fiber, Vitamin C, and B1 (Thiamine)."
     },
     "Whole Grains": {
-        "label": "Whole Grains (Rice, Wheat, Oats)",
+        "label": "Whole Grains (Rice, Wheat, Oats - Cereal Matrix)",
         "examples": "Rice, Wheat, Oats, Barley, Brown Rice",
         "description": "Intact grain kernels with germ and bran intact, major source of B-vitamins."
     },
     "Legumes": {
-        "label": "Legumes (Beans, Lentils, Peas)",
+        "label": "Legumes (Beans, Lentils, Peas - Pulse Matrix)",
         "examples": "Chickpeas, Lentils (Dal), Black beans, Soybeans, Peas",
         "description": "High-protein pulse crops containing thiamine, riboflavin, B6, and folates."
     },
     "Chickpea (Cicer arietinum L.)": {
-        "label": "Chickpea (Cicer arietinum L. / Chana)",
+        "label": "Chickpea (Cicer arietinum L. / Chana - Legume)",
         "examples": "Garbanzo beans, Bengal gram, Kabuli chana",
         "description": "High-protein legume studied specifically in domestic cooking kinetics for Vitamin B6."
     },
     "Citrus Fruits": {
-        "label": "Citrus Fruits (Orange, Lemon, Lime)",
+        "label": "Citrus Fruits (Orange, Lemon, Lime - Fruit Matrix)",
         "examples": "Orange, Lemon, Lime, Grapefruit, Amla",
         "description": "Acidic fruits containing high natural ascorbic acid (Vitamin C) and folates."
     },
     "Leafy Greens": {
-        "label": "Leafy Greens (Spinach, Kale, Fenugreek)",
+        "label": "Leafy Greens (Spinach, Kale, Fenugreek - Green Vegetables)",
         "examples": "Spinach (Palak), Kale, Fenugreek (Methi), Cabbage",
         "description": "Tender green vegetables with high heat susceptibility for Vitamin C, B2, and B9."
     },
     "Fruit Juices": {
-        "label": "Fruit Juices (Apple, Orange, Berry Juices)",
+        "label": "Fruit Juices (Apple, Orange, Berry Juices - Liquid Matrix)",
         "examples": "Apple juice, Orange juice, Grape juice",
         "description": "Liquid fruit substrates where heat transfer is convective."
     },
     "Cereals": {
-        "label": "Cereals (Corn, Millets, Sorghum)",
+        "label": "Cereals (Corn, Millets, Sorghum - Grain Matrix)",
         "examples": "Corn (Maize), Sorghum (Jowar), Pearl millet (Bajra)",
         "description": "Staple cereal grains providing dietary riboflavin (B2)."
     },
     "Dairy Products": {
-        "label": "Dairy Products (Milk, Yogurt)",
+        "label": "Dairy Products (Milk, Yogurt - Animal Matrix)",
         "examples": "Cow milk, Buffalo milk, Yogurt, Whey",
         "description": "Liquid and semi-solid dairy containing thiamine, riboflavin, and pantothenic acid."
     },
     "Meats": {
-        "label": "Meats (Poultry, Fish, Beef)",
+        "label": "Meats (Poultry, Fish, Beef - Muscle Tissue)",
         "examples": "Chicken, Fish, Mutton, Beef",
         "description": "Animal protein tissue rich in B1, B5, and B6."
     },
     "McIlvaine buffer": {
-        "label": "McIlvaine buffer (pH 3–7 Aqueous Standard)",
+        "label": "McIlvaine buffer (pH 3–7 Aqueous Model Buffer)",
         "examples": "Citrate-phosphate laboratory buffer",
         "description": "Controlled ionic strength aqueous model system for isolated ascorbic acid oxidation."
     },
     "Rosehip nectar": {
-        "label": "Rosehip nectar (Rosa canina Extract)",
+        "label": "Rosehip nectar (Rosa canina Extract - High Vit C)",
         "examples": "Rosehip juice/puree beverage",
         "description": "Ultra-rich natural ascorbic acid substrate tested across 70°C–95°C thermal pasteurization."
     },
     "Strawberry nectar": {
-        "label": "Strawberry nectar (Fragaria ananassa)",
+        "label": "Strawberry nectar (Fragaria ananassa - High Vit C)",
         "examples": "Strawberry beverage puree",
         "description": "Berry juice system with active anthocyanin pigments and high Vitamin C content."
     }
 }
 
 SOLAR_FOOD_METADATA: Dict[str, str] = {
-    "Potato chips": "Potato chips (Tuber / Root Matrix)",
-    "Rice": "Rice (Whole Grain / Cereal Matrix)",
+    "Potato chips": "Potato chips (Tuber / Root Matrix - e.g. Potato)",
+    "Rice": "Rice (Whole Grain / Cereal Matrix - e.g. Rice)",
     "Water": "Water (Aqueous Standard)",
     "Water (test medium)": "Water (Standard Solar Test Medium)",
     "Chamber air (proxy)": "Chamber air (Cavity Air Proxy)",
@@ -155,6 +155,34 @@ def get_available_vitamins() -> List[str]:
     # Canonical order preference
     order_pref = ["Vitamin C", "Vitamin B1", "Vitamin B2", "Vitamin B5", "Vitamin B6", "Vitamin B9"]
     return [v for v in order_pref if v in vitamins] + [v for v in vitamins if v not in order_pref]
+
+
+def get_all_food_sources() -> List[str]:
+    """Returns all 14 unique food matrices / substrates in structured logical order."""
+    return [
+        "Tubers",
+        "Root Vegetables",
+        "Whole Grains",
+        "Legumes",
+        "Chickpea (Cicer arietinum L.)",
+        "Citrus Fruits",
+        "Leafy Greens",
+        "Fruit Juices",
+        "Cereals",
+        "Dairy Products",
+        "Meats",
+        "McIlvaine buffer",
+        "Rosehip nectar",
+        "Strawberry nectar"
+    ]
+
+
+def get_vitamins_for_food_source(food_source: str) -> List[str]:
+    """Returns all vitamins available for a given food source."""
+    vits = [entry["vitamin"] for entry in KINETICS_REGISTRY if entry["food_source"] == food_source]
+    order_pref = ["Vitamin C", "Vitamin B1", "Vitamin B2", "Vitamin B5", "Vitamin B6", "Vitamin B9"]
+    res = [v for v in order_pref if v in vits] + [v for v in vits if v not in order_pref]
+    return res if res else ["Vitamin C"]
 
 
 def get_food_sources_for_vitamin(vitamin: str) -> List[str]:

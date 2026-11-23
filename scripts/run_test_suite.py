@@ -40,9 +40,13 @@ from src.predictor import predict_food_temperature, predict_solar_cooking_and_nu
 from src.kinetics import (
     get_all_kinetics_df,
     get_available_vitamins,
+    get_all_food_sources,
+    get_vitamins_for_food_source,
     get_food_sources_for_vitamin,
     calculate_arrhenius_k,
-    simulate_vitamin_degradation
+    simulate_vitamin_degradation,
+    FOOD_SOURCE_METADATA,
+    SOLAR_FOOD_METADATA
 )
 
 class TestSolarCookingSystem(unittest.TestCase):
@@ -236,6 +240,25 @@ class TestSolarCookingSystem(unittest.TestCase):
         self.assertLessEqual(res["final_retention_percent"], 100.0)
         self.assertAlmostEqual(res["final_retention_percent"] + res["final_degradation_percent"], 100.0, places=1)
         self.assertEqual(len(res["times_min"]), 31)
+
+    def test_15_all_14_food_matrices(self):
+        """Verify that all 14 kinetics food matrices are defined, labeled, and include Tubers for Potato."""
+        sources = get_all_food_sources()
+        self.assertEqual(len(sources), 14, f"Expected 14 food matrices, got {len(sources)}")
+        
+        # Verify Potato is documented in Tubers and carrots/radish in Root Vegetables
+        self.assertIn("Tubers", sources)
+        self.assertIn("Potato", FOOD_SOURCE_METADATA["Tubers"]["examples"])
+        self.assertIn("Root Vegetables", sources)
+        
+        # Verify all 14 have metadata and at least one vitamin kinetics parameter
+        for s in sources:
+            self.assertIn(s, FOOD_SOURCE_METADATA, f"Food source '{s}' missing from FOOD_SOURCE_METADATA")
+            vits = get_vitamins_for_food_source(s)
+            self.assertGreater(len(vits), 0, f"Food source '{s}' must have at least 1 vitamin")
+
+        # Verify Solar Food Matrix has Potato chips
+        self.assertIn("Potato chips", SOLAR_FOOD_METADATA)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
