@@ -235,6 +235,8 @@ def render_vitamin_kinetics():
             sel_vit = st.selectbox("Select Vitamin:", options=vitamins_list, key="rate_vit")
         with r_col2:
             sources = get_food_sources_for_vitamin(sel_vit)
+            if "rate_source" in st.session_state and st.session_state["rate_source"] not in sources:
+                st.session_state["rate_source"] = sources[0]
             sel_source = st.selectbox("Select Food Matrix:", options=sources, key="rate_source")
 
         sub_df = df_kinetics[(df_kinetics["vitamin"] == sel_vit) & (df_kinetics["food_source"] == sel_source)]

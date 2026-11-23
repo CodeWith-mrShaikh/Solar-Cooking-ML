@@ -186,7 +186,10 @@ def render_prediction():
         )
 
         available_sources = get_food_sources_for_vitamin(selected_vitamin)
-        curr_src = st.session_state.get("input_vitamin_source", defaults["vitamin_source"])
+        if "input_vitamin_source" in st.session_state and st.session_state["input_vitamin_source"] not in available_sources:
+            st.session_state["input_vitamin_source"] = available_sources[0]
+
+        curr_src = st.session_state.get("input_vitamin_source", available_sources[0])
         src_idx = available_sources.index(curr_src) if curr_src in available_sources else 0
         selected_source = st.selectbox(
             label="Kinetics Food Matrix / Substrate",
