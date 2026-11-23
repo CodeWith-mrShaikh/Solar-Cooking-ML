@@ -364,5 +364,22 @@ def render_eda():
             )
             st.plotly_chart(fig_k80, use_container_width=True)
 
-        st.markdown("#### Kinetics Dataset Inspection")
-        st.dataframe(kin_df[["vitamin", "food_source", "A_per_min", "Ea_kJ_mol", "k_at_80C_per_min", "origin", "doi"]], use_container_width=True)
+        st.markdown("#### Kinetics Dataset Inspection (14 Food Matrices & 6 Vitamins)")
+        eda_display_cols = ["vitamin", "food_source", "example_foods", "A_per_min", "Ea_kJ_mol", "k_at_80C_per_min", "origin", "doi"]
+        st.dataframe(
+            kin_df[eda_display_cols].rename(columns={
+                "vitamin": "Vitamin",
+                "food_source": "Food Matrix / Substrate",
+                "example_foods": "Example Foods (e.g. Potato, Rice)",
+                "A_per_min": "A (min⁻¹)",
+                "Ea_kJ_mol": "Ea (kJ/mol)",
+                "k_at_80C_per_min": "k at 80°C (min⁻¹)",
+                "origin": "Data Origin",
+                "doi": "DOI / Citation"
+            }).style.format({
+                "A (min⁻¹)": "{:.2e}",
+                "Ea (kJ/mol)": "{:.2f}",
+                "k at 80°C (min⁻¹)": "{:.4f}"
+            }),
+            use_container_width=True
+        )

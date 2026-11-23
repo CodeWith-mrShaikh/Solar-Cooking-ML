@@ -61,86 +61,154 @@ KINETICS_REGISTRY: List[Dict[str, Any]] = [
 ]
 
 # Descriptive metadata and real-world dietary examples for each kinetics food matrix
+ALL_FOOD_SOURCES_ORDERED: List[str] = [
+    "Tubers",
+    "Root Vegetables",
+    "Whole Grains",
+    "Cereals",
+    "Legumes",
+    "Chickpea (Cicer arietinum L.)",
+    "Leafy Greens",
+    "Citrus Fruits",
+    "Fruit Juices",
+    "Dairy Products",
+    "Meats",
+    "Rosehip nectar",
+    "Strawberry nectar",
+    "McIlvaine buffer"
+]
+
 FOOD_SOURCE_METADATA: Dict[str, Dict[str, str]] = {
     "Tubers": {
-        "label": "Tubers (Potato, Cassava, Yam - Root / Tuber Source)",
-        "examples": "Potato (Root Tuber), Cassava, Yam, Sweet Potato",
-        "description": "Starchy underground stem tubers and root sources rich in Vitamin C, B5, and B6."
+        "label": "Tubers (Potato, Cassava, Yam)",
+        "category": "Underground Stem Tuber",
+        "examples": "Potato, Cassava, Yam, Sweet Potato",
+        "description": "Starchy underground stem tubers rich in Vitamin C, B5, and B6. Primary kinetic counterpart for solar potato cooking.",
+        "matched_solar": "Potato chips"
     },
     "Root Vegetables": {
-        "label": "Root Vegetables (Carrots, Beetroot, Radish - Root Source)",
-        "examples": "Carrots, Beetroot, Radish, Turnips (Taproot Vegetables)",
-        "description": "Underground taproots rich in dietary fiber, Vitamin C, and B1 (Thiamine)."
+        "label": "Root Vegetables (Carrots, Beetroot, Radish)",
+        "category": "Taproot Vegetable",
+        "examples": "Carrots, Beetroot, Radish, Turnips",
+        "description": "Underground taproots rich in dietary fiber, Vitamin C, and B1 (Thiamine). Related root matrix for solar root/tuber cooking.",
+        "matched_solar": "Potato chips"
     },
     "Whole Grains": {
-        "label": "Whole Grains (Rice, Wheat, Oats - Cereal Matrix)",
+        "label": "Whole Grains (Rice, Wheat, Oats)",
+        "category": "Cereal Grain / Seed",
         "examples": "Rice, Wheat, Oats, Barley, Brown Rice",
-        "description": "Intact grain kernels with germ and bran intact, major source of B-vitamins."
+        "description": "Intact grain kernels with germ and bran intact, major source of B-vitamins (B1, B5, B6, B9). Primary counterpart for solar rice cooking.",
+        "matched_solar": "Rice"
     },
     "Legumes": {
-        "label": "Legumes (Beans, Lentils, Peas - Pulse Matrix)",
+        "label": "Legumes (Beans, Lentils, Peas)",
+        "category": "Pulse / Legume",
         "examples": "Chickpeas, Lentils (Dal), Black beans, Soybeans, Peas",
-        "description": "High-protein pulse crops containing thiamine, riboflavin, B6, and folates."
+        "description": "High-protein pulse crops containing thiamine (B1), riboflavin (B2), B6, and folates (B9)."
     },
     "Chickpea (Cicer arietinum L.)": {
-        "label": "Chickpea (Cicer arietinum L. / Chana - Legume)",
+        "label": "Chickpea (Cicer arietinum L. / Chana)",
+        "category": "Pulse / Legume",
         "examples": "Garbanzo beans, Bengal gram, Kabuli chana",
         "description": "High-protein legume studied specifically in domestic cooking kinetics for Vitamin B6."
     },
     "Citrus Fruits": {
-        "label": "Citrus Fruits (Orange, Lemon, Lime - Fruit Matrix)",
+        "label": "Citrus Fruits (Orange, Lemon, Lime)",
+        "category": "Acidic Citrus Fruit",
         "examples": "Orange, Lemon, Lime, Grapefruit, Amla",
-        "description": "Acidic fruits containing high natural ascorbic acid (Vitamin C) and folates."
+        "description": "Acidic fruits containing high natural ascorbic acid (Vitamin C) and folates (B9)."
     },
     "Leafy Greens": {
-        "label": "Leafy Greens (Spinach, Kale, Fenugreek - Green Vegetables)",
+        "label": "Leafy Greens (Spinach, Kale, Fenugreek)",
+        "category": "Green Leafy Vegetable",
         "examples": "Spinach (Palak), Kale, Fenugreek (Methi), Cabbage",
         "description": "Tender green vegetables with high heat susceptibility for Vitamin C, B2, and B9."
     },
     "Fruit Juices": {
-        "label": "Fruit Juices (Apple, Orange, Berry Juices - Liquid Matrix)",
+        "label": "Fruit Juices (Apple, Orange, Berry Juices)",
+        "category": "Liquid Beverage / Juice",
         "examples": "Apple juice, Orange juice, Grape juice",
-        "description": "Liquid fruit substrates where heat transfer is convective."
+        "description": "Liquid fruit substrates where heat transfer is convective (Vitamin C)."
     },
     "Cereals": {
-        "label": "Cereals (Corn, Millets, Sorghum - Grain Matrix)",
+        "label": "Cereals (Corn, Millets, Sorghum)",
+        "category": "Staple Cereal Grass",
         "examples": "Corn (Maize), Sorghum (Jowar), Pearl millet (Bajra)",
         "description": "Staple cereal grains providing dietary riboflavin (B2)."
     },
     "Dairy Products": {
-        "label": "Dairy Products (Milk, Yogurt - Animal Matrix)",
+        "label": "Dairy Products (Milk, Yogurt)",
+        "category": "Dairy / Animal Fluid",
         "examples": "Cow milk, Buffalo milk, Yogurt, Whey",
-        "description": "Liquid and semi-solid dairy containing thiamine, riboflavin, and pantothenic acid."
+        "description": "Liquid and semi-solid dairy containing thiamine (B1), riboflavin (B2), and pantothenic acid (B5)."
     },
     "Meats": {
-        "label": "Meats (Poultry, Fish, Beef - Muscle Tissue)",
+        "label": "Meats (Poultry, Fish, Beef)",
+        "category": "Animal Tissue / Muscle",
         "examples": "Chicken, Fish, Mutton, Beef",
         "description": "Animal protein tissue rich in B1, B5, and B6."
     },
     "McIlvaine buffer": {
-        "label": "McIlvaine buffer (pH 3–7 Aqueous Model Buffer)",
+        "label": "McIlvaine buffer (pH 3–7 Aqueous Standard)",
+        "category": "Aqueous Model Buffer",
         "examples": "Citrate-phosphate laboratory buffer",
-        "description": "Controlled ionic strength aqueous model system for isolated ascorbic acid oxidation."
+        "description": "Controlled ionic strength aqueous model system for isolated ascorbic acid oxidation. Counterpart to solar water testing.",
+        "matched_solar": "Water"
     },
     "Rosehip nectar": {
-        "label": "Rosehip nectar (Rosa canina Extract - High Vit C)",
+        "label": "Rosehip nectar (Rosa canina Extract)",
+        "category": "Fruit Nectar / Puree",
         "examples": "Rosehip juice/puree beverage",
-        "description": "Ultra-rich natural ascorbic acid substrate tested across 70°C–95°C thermal pasteurization."
+        "description": "Ultra-rich natural ascorbic acid substrate tested across 70°C–95°C thermal pasteurization (Vitamin C)."
     },
     "Strawberry nectar": {
-        "label": "Strawberry nectar (Fragaria ananassa - High Vit C)",
+        "label": "Strawberry nectar (Fragaria ananassa)",
+        "category": "Fruit Nectar / Puree",
         "examples": "Strawberry beverage puree",
         "description": "Berry juice system with active anthocyanin pigments and high Vitamin C content."
     }
 }
 
 SOLAR_FOOD_METADATA: Dict[str, str] = {
-    "Potato chips": "Potato chips (Tuber / Root Matrix - e.g. Potato)",
-    "Rice": "Rice (Whole Grain / Cereal Matrix - e.g. Rice)",
+    "Potato chips": "Potato chips (Tuber / Root Matrix)",
+    "Rice": "Rice (Whole Grain / Cereal Matrix)",
     "Water": "Water (Aqueous Standard)",
     "Water (test medium)": "Water (Standard Solar Test Medium)",
     "Chamber air (proxy)": "Chamber air (Cavity Air Proxy)",
     "Water-temperature proxy from Tw": "Water-temperature proxy from Tw (Thermocouple Proxy)"
+}
+
+SOLAR_TO_KINETICS_RECOMMENDATION: Dict[str, Dict[str, Any]] = {
+    "Potato chips": {
+        "primary_match": "Tubers",
+        "secondary_match": "Root Vegetables",
+        "note": "Potato is botanically an underground stem tuber ('Tubers'). Also closely related to taproot kinetics ('Root Vegetables')."
+    },
+    "Rice": {
+        "primary_match": "Whole Grains",
+        "secondary_match": "Cereals",
+        "note": "Parboiled or white rice belongs to whole cereal grains ('Whole Grains' or 'Cereals')."
+    },
+    "Water": {
+        "primary_match": "McIlvaine buffer",
+        "secondary_match": None,
+        "note": "Aqueous cooking medium corresponds directly to the McIlvaine aqueous buffer benchmark."
+    },
+    "Water (test medium)": {
+        "primary_match": "McIlvaine buffer",
+        "secondary_match": None,
+        "note": "Standard water test surrogate corresponds to the McIlvaine buffer benchmark."
+    },
+    "Chamber air (proxy)": {
+        "primary_match": None,
+        "secondary_match": None,
+        "note": "Air cavity proxy is a thermal transfer surrogate rather than an edible nutritional food matrix."
+    },
+    "Water-temperature proxy from Tw": {
+        "primary_match": "McIlvaine buffer",
+        "secondary_match": None,
+        "note": "Thermocouple water proxy corresponds to aqueous reference kinetics."
+    }
 }
 
 # Quick mapping dictionary for fast lookup: (vitamin, food_source) -> params
@@ -158,37 +226,32 @@ def get_available_vitamins() -> List[str]:
 
 
 def get_all_food_sources() -> List[str]:
-    """Returns all 14 unique food matrices / substrates in structured logical order."""
-    return [
-        "Tubers",
-        "Root Vegetables",
-        "Whole Grains",
-        "Legumes",
-        "Chickpea (Cicer arietinum L.)",
-        "Citrus Fruits",
-        "Leafy Greens",
-        "Fruit Juices",
-        "Cereals",
-        "Dairy Products",
-        "Meats",
-        "McIlvaine buffer",
-        "Rosehip nectar",
-        "Strawberry nectar"
-    ]
-
-
-def get_vitamins_for_food_source(food_source: str) -> List[str]:
-    """Returns all vitamins available for a given food source."""
-    vits = [entry["vitamin"] for entry in KINETICS_REGISTRY if entry["food_source"] == food_source]
-    order_pref = ["Vitamin C", "Vitamin B1", "Vitamin B2", "Vitamin B5", "Vitamin B6", "Vitamin B9"]
-    res = [v for v in order_pref if v in vits] + [v for v in vits if v not in order_pref]
-    return res if res else ["Vitamin C"]
+    """
+    Returns the canonical list of all 14 unique kinetics food matrices/substrates.
+    Guarantees every substrate is represented in preferred nutritional order.
+    """
+    unique_sources = list({entry["food_source"] for entry in KINETICS_REGISTRY})
+    return [s for s in ALL_FOOD_SOURCES_ORDERED if s in unique_sources] + sorted([s for s in unique_sources if s not in ALL_FOOD_SOURCES_ORDERED])
 
 
 def get_food_sources_for_vitamin(vitamin: str) -> List[str]:
     """Returns all food matrices/sources available for a given vitamin."""
     sources = [entry["food_source"] for entry in KINETICS_REGISTRY if entry["vitamin"] == vitamin]
-    return sorted(sources)
+    # Return in canonical order
+    return [s for s in ALL_FOOD_SOURCES_ORDERED if s in sources] + sorted([s for s in sources if s not in ALL_FOOD_SOURCES_ORDERED])
+
+
+def get_vitamins_for_food_source(food_source: str) -> List[str]:
+    """
+    Returns all heat-sensitive vitamins characterized for a specific food matrix/substrate.
+    For example:
+      'Tubers' -> ['Vitamin C', 'Vitamin B5', 'Vitamin B6']
+      'Root Vegetables' -> ['Vitamin C', 'Vitamin B1']
+      'Whole Grains' -> ['Vitamin B1', 'Vitamin B5', 'Vitamin B6', 'Vitamin B9']
+    """
+    vits = [entry["vitamin"] for entry in KINETICS_REGISTRY if entry["food_source"] == food_source]
+    order_pref = ["Vitamin C", "Vitamin B1", "Vitamin B2", "Vitamin B5", "Vitamin B6", "Vitamin B9"]
+    return [v for v in order_pref if v in vits] + sorted([v for v in vits if v not in order_pref])
 
 
 def get_kinetics_entry(vitamin: str, food_source: Optional[str] = None) -> Dict[str, Any]:
@@ -336,6 +399,49 @@ def simulate_vitamin_degradation(
     }
 
     return summary, timeline_df
+
+
+def simulate_multi_vitamin_degradation(
+    times_min: np.ndarray,
+    temperatures_C: np.ndarray,
+    food_source: str,
+    solar_food_matrix: Optional[str] = None
+) -> Tuple[Dict[str, Any], pd.DataFrame]:
+    """
+    Simulates transient thermal degradation simultaneously for ALL vitamins
+    characterized within the specified food matrix.
+    Returns:
+        multi_summary: Dict mapping vitamin name -> single vitamin summary dict
+        combined_df: DataFrame containing time, temperature, and per-vitamin kinetics
+    """
+    vits = get_vitamins_for_food_source(food_source)
+    if not vits:
+        raise ValueError(f"No vitamins found for kinetics food matrix '{food_source}'.")
+
+    times = np.asarray(times_min, dtype=float)
+    temps = np.asarray(temperatures_C, dtype=float)
+
+    multi_summary = {}
+    combined_df = pd.DataFrame({
+        "time_min": times,
+        "predicted_food_temp_C": np.round(temps, 2)
+    })
+
+    for v in vits:
+        summary, timeline = simulate_vitamin_degradation(
+            times_min=times,
+            temperatures_C=temps,
+            vitamin=v,
+            food_source=food_source,
+            solar_food_matrix=solar_food_matrix
+        )
+        multi_summary[v] = summary
+        slug = v.lower().replace(" ", "_")
+        combined_df[f"{slug}_retention_percent"] = timeline["real_retention_percent"]
+        combined_df[f"{slug}_degradation_percent"] = timeline["real_degradation_percent"]
+        combined_df[f"{slug}_k_per_min"] = timeline["k_real_per_min"]
+
+    return multi_summary, combined_df
 
 
 def get_all_kinetics_df() -> pd.DataFrame:

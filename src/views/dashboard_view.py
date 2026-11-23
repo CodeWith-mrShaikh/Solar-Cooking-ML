@@ -80,11 +80,11 @@ def render_dashboard():
     with c1:
         st.metric(label="Solar Observations", value=f"{kpis['total_rows']:,}", help="Total 1-minute resampled rows")
     with c2:
-        st.metric(label="Experimental Cooking Runs", value=f"{kpis['unique_runs_count']}", help="Distinct physical runs (run_id)")
+        st.metric(label="Cooking Runs", value=f"{kpis['unique_runs_count']}", help="Distinct physical runs (run_id)")
     with c3:
-        st.metric(label="Nutrient Kinetics Entries", value="30 entries", help="Zenodo and literature Arrhenius parameters")
+        st.metric(label="Kinetics Substrates", value="14 Matrices", help="14 biological food matrices (Tubers, Root Vegetables, Whole Grains, etc.) with 30 parameter pairs")
     with c4:
-        st.metric(label="Vitamins Tracked", value="6 Vitamins", help="C, B1, B2, B5, B6, B9")
+        st.metric(label="Vitamins Tracked", value="6 Vitamins", help="Heat-sensitive vitamins: C, B1, B2, B5, B6, B9")
 
     c5, c6, c7, c8 = st.columns(4)
     with c5:
@@ -92,7 +92,7 @@ def render_dashboard():
     with c6:
         st.metric(label="Food Temp Range", value=f"{kpis['target_min']:.1f} – {kpis['target_max']:.1f} °C")
     with c7:
-        st.metric(label="Food Matrices", value=f"{len(kpis['food_matrices'])} types")
+        st.metric(label="Solar Food Matrices", value=f"{len(kpis['food_matrices'])} classes", help="Physical experimental runs: Potato chips, Rice, Water, etc.")
     with c8:
         st.metric(label="Solar Cookers", value=f"{len(kpis['cooker_types'])} designs")
 

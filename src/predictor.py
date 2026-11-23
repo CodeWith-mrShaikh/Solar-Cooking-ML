@@ -28,8 +28,11 @@ try:
     )
     from src.kinetics import (
         simulate_vitamin_degradation,
+        simulate_multi_vitamin_degradation,
         get_available_vitamins,
+        get_all_food_sources,
         get_food_sources_for_vitamin,
+        get_vitamins_for_food_source,
         get_kinetics_entry
     )
 except (ImportError, KeyError):
@@ -49,8 +52,11 @@ except (ImportError, KeyError):
     )
     from kinetics import (
         simulate_vitamin_degradation,
+        simulate_multi_vitamin_degradation,
         get_available_vitamins,
+        get_all_food_sources,
         get_food_sources_for_vitamin,
+        get_vitamins_for_food_source,
         get_kinetics_entry
     )
 
@@ -218,6 +224,9 @@ def predict_solar_cooking_and_nutrients(
       Solar/Cooking Inputs -> ML Extra Trees -> Transient Temperature Curve T(t)
                            -> First-order Kinetics ln(C/C0) = -∫ k(T) dt
                            -> Retention(t) & Degradation(t)
+
+    Supports both single vitamin simulation and multi-vitamin simulation across
+    all vitamins present in a selected food matrix (e.g. Tubers -> C, B5, B6).
     """
     start_time = time.perf_counter()
 
@@ -227,33 +236,78 @@ def predict_solar_cooking_and_nutrients(
 
     # 2. Predict transient temperature trajectory from t=0 to t=duration
     times, temps = predict_temperature_trajectory(raw_inputs, duration)
-
-    # 3. Simulate vitamin degradation kinetics
     solar_matrix = raw_inputs.get("food_matrix", "")
-    summary, timeline_df = simulate_vitamin_degradation(
-        times_min=times,
-        temperatures_C=temps,
-        vitamin=vitamin,
-        food_source=food_source,
-        solar_food_matrix=solar_matrix
-    )
 
-    latency_ms = (time.perf_counter() - start_time) * 1000.0
+    # Check if multi-vitamin simulation is requested
+    is_multi = str(vitamin).upper() in ["ALL", "MULTI"] or str(vitamin).startswith("All Vitamins")
 
-    return {
-        "point_result": point_result,
-        "predicted_food_temp_C": point_result["predicted_food_temp_C"],
-        "final_retention_percent": summary["final_retention_percent"],
-        "final_degradation_percent": summary["final_degradation_percent"],
-        "final_ideal_retention_percent": summary["final_ideal_retention_percent"],
-        "final_ideal_degradation_percent": summary["final_ideal_degradation_percent"],
-        "avg_retention_percent": summary["avg_retention_percent"],
-        "peak_degradation_rate_percent_per_min": summary["peak_degradation_rate_percent_per_min"],
-        "peak_degradation_rate_time_min": summary["peak_degradation_rate_time_min"],
-        "times_min": times,
-        "temperatures_C": temps,
-        "summary": summary,
-        "timeline_df": timeline_df,
-        "warnings": point_result["warnings"],
-        "inference_time_ms": round(latency_ms, 2)
-    }
+    if is_multi:
+        if food_source is None:
+            food_source = "Tubers"
+        multi_summary, multi_timeline_df = simulate_multi_vitamin_degradation(
+            times_min=times,
+            temperatures_C=temps,
+            food_source=food_source,
+            solar_food_matrix=solar_matrix
+        )
+
+        first_vit = list(multi_summary.keys())[0]
+        first_summary = multi_summary[first_vit]
+        avg_retention = float(np.mean([s["final_retention_percent"] for s in multi_summary.values()]))
+        avg_degradation = float(np.mean([s["final_degradation_percent"] for s in multi_summary.values()]))
+
+        latency_ms = (time.perf_counter() - start_time) * 1000.0
+
+        return {
+            "point_result": point_result,
+            "predicted_food_temp_C": point_result["predicted_food_temp_C"],
+            "is_multi_vitamin": True,
+            "food_source": food_source,
+            "target_vitamins": list(multi_summary.keys()),
+            "multi_summary": multi_summary,
+            "final_retention_percent": round(avg_retention, 2),
+            "final_degradation_percent": round(avg_degradation, 2),
+            "final_ideal_retention_percent": first_summary["final_ideal_retention_percent"],
+            "final_ideal_degradation_percent": first_summary["final_ideal_degradation_percent"],
+            "avg_retention_percent": round(avg_retention, 2),
+            "peak_degradation_rate_percent_per_min": first_summary["peak_degradation_rate_percent_per_min"],
+            "peak_degradation_rate_time_min": first_summary["peak_degradation_rate_time_min"],
+            "times_min": times,
+            "temperatures_C": temps,
+            "summary": first_summary,
+            "timeline_df": multi_timeline_df,
+            "warnings": point_result["warnings"],
+            "inference_time_ms": round(latency_ms, 2)
+        }
+    else:
+        # Single vitamin simulation
+        summary, timeline_df = simulate_vitamin_degradation(
+            times_min=times,
+            temperatures_C=temps,
+            vitamin=vitamin,
+            food_source=food_source,
+            solar_food_matrix=solar_matrix
+        )
+
+        latency_ms = (time.perf_counter() - start_time) * 1000.0
+
+        return {
+            "point_result": point_result,
+            "predicted_food_temp_C": point_result["predicted_food_temp_C"],
+            "is_multi_vitamin": False,
+            "target_vitamins": [vitamin],
+            "food_source": summary["food_source"],
+            "final_retention_percent": summary["final_retention_percent"],
+            "final_degradation_percent": summary["final_degradation_percent"],
+            "final_ideal_retention_percent": summary["final_ideal_retention_percent"],
+            "final_ideal_degradation_percent": summary["final_ideal_degradation_percent"],
+            "avg_retention_percent": summary["avg_retention_percent"],
+            "peak_degradation_rate_percent_per_min": summary["peak_degradation_rate_percent_per_min"],
+            "peak_degradation_rate_time_min": summary["peak_degradation_rate_time_min"],
+            "times_min": times,
+            "temperatures_C": temps,
+            "summary": summary,
+            "timeline_df": timeline_df,
+            "warnings": point_result["warnings"],
+            "inference_time_ms": round(latency_ms, 2)
+        }

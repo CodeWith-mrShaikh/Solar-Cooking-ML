@@ -41,12 +41,10 @@ from src.kinetics import (
     get_all_kinetics_df,
     get_available_vitamins,
     get_all_food_sources,
-    get_vitamins_for_food_source,
     get_food_sources_for_vitamin,
+    get_vitamins_for_food_source,
     calculate_arrhenius_k,
-    simulate_vitamin_degradation,
-    FOOD_SOURCE_METADATA,
-    SOLAR_FOOD_METADATA
+    simulate_vitamin_degradation
 )
 
 class TestSolarCookingSystem(unittest.TestCase):
@@ -241,24 +239,56 @@ class TestSolarCookingSystem(unittest.TestCase):
         self.assertAlmostEqual(res["final_retention_percent"] + res["final_degradation_percent"], 100.0, places=1)
         self.assertEqual(len(res["times_min"]), 31)
 
-    def test_15_all_14_food_matrices(self):
-        """Verify that all 14 kinetics food matrices are defined, labeled, and include Tubers for Potato."""
-        sources = get_all_food_sources()
-        self.assertEqual(len(sources), 14, f"Expected 14 food matrices, got {len(sources)}")
-        
-        # Verify Potato is documented in Tubers and carrots/radish in Root Vegetables
-        self.assertIn("Tubers", sources)
-        self.assertIn("Potato", FOOD_SOURCE_METADATA["Tubers"]["examples"])
-        self.assertIn("Root Vegetables", sources)
-        
-        # Verify all 14 have metadata and at least one vitamin kinetics parameter
-        for s in sources:
-            self.assertIn(s, FOOD_SOURCE_METADATA, f"Food source '{s}' missing from FOOD_SOURCE_METADATA")
-            vits = get_vitamins_for_food_source(s)
-            self.assertGreater(len(vits), 0, f"Food source '{s}' must have at least 1 vitamin")
+    def test_15_food_sources_and_vitamins_coverage(self):
+        """Verify that all 14 kinetics food matrices and 6 vitamins are fully covered."""
+        all_sources = get_all_food_sources()
+        self.assertEqual(len(all_sources), 14, f"Expected 14 unique kinetics food sources, got {len(all_sources)}")
 
-        # Verify Solar Food Matrix has Potato chips
-        self.assertIn("Potato chips", SOLAR_FOOD_METADATA)
+        expected_sources = [
+            "Tubers", "Root Vegetables", "Whole Grains", "Cereals", "Legumes",
+            "Chickpea (Cicer arietinum L.)", "Leafy Greens", "Citrus Fruits",
+            "Fruit Juices", "Dairy Products", "Meats", "Rosehip nectar",
+            "Strawberry nectar", "McIlvaine buffer"
+        ]
+        for src in expected_sources:
+            self.assertIn(src, all_sources)
+            vits = get_vitamins_for_food_source(src)
+            self.assertGreater(len(vits), 0, f"Food source '{src}' must have at least one vitamin")
+
+        # Specific biological verifications
+        tuber_vits = get_vitamins_for_food_source("Tubers")
+        self.assertEqual(sorted(tuber_vits), sorted(["Vitamin C", "Vitamin B5", "Vitamin B6"]))
+
+        root_vits = get_vitamins_for_food_source("Root Vegetables")
+        self.assertEqual(sorted(root_vits), sorted(["Vitamin C", "Vitamin B1"]))
+
+        grain_vits = get_vitamins_for_food_source("Whole Grains")
+        self.assertEqual(sorted(grain_vits), sorted(["Vitamin B1", "Vitamin B5", "Vitamin B6", "Vitamin B9"]))
+
+    def test_16_multi_vitamin_simulation(self):
+        """Verify multi-vitamin simultaneous simulation across all vitamins in Tubers (Potato)."""
+        raw_input = {
+            "time_min": 35.0,
+            "solar_irradiance_W_m2": 700.0,
+            "ambient_temp_C": 32.0,
+            "absorber_temp_C": 90.0,
+            "mass_kg": 0.8,
+            "food_matrix": "Potato chips",
+            "cooker_type": "box"
+        }
+        res = predict_solar_cooking_and_nutrients(
+            raw_input,
+            vitamin="All Vitamins in this Food Matrix",
+            food_source="Tubers"
+        )
+        self.assertTrue(res.get("is_multi_vitamin", False))
+        self.assertIn("multi_summary", res)
+        self.assertEqual(len(res["target_vitamins"]), 3)
+        self.assertIn("Vitamin C", res["multi_summary"])
+        self.assertIn("Vitamin B5", res["multi_summary"])
+        self.assertIn("Vitamin B6", res["multi_summary"])
+        self.assertIn("predicted_food_temp_C", res)
+        self.assertGreater(res["predicted_food_temp_C"], 0.0)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
