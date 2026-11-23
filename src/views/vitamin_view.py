@@ -194,6 +194,7 @@ def render_vitamin_kinetics():
         inv_T_1000 = 1000.0 / temp_K_range
 
         fig_arrh = go.Figure()
+        custom_temps = [f"{t:.0f} °C" for t in temp_C_range]
         for _, row in vit_df.iterrows():
             k_vals = calculate_arrhenius_k(temp_C_range, row["A_per_min"], row["Ea_J_mol"])
             ln_k = np.log(np.maximum(k_vals, 1e-12))
@@ -202,8 +203,8 @@ def render_vitamin_kinetics():
                 y=ln_k,
                 mode="lines",
                 name=f"{row['food_source']} ({row['Ea_kJ_mol']:.1f} kJ/mol)",
-                hovertemplate="1000/T: %{x:.2f} K⁻¹<br>ln(k): %{y:.2f}<br>T: " + 
-                              [f"{t:.0f} °C" for t in temp_C_range]
+                customdata=custom_temps,
+                hovertemplate="1000/T: %{x:.2f} K⁻¹<br>ln(k): %{y:.2f}<br>T: %{customdata}<extra></extra>"
             ))
 
         fig_arrh.update_layout(
@@ -236,7 +237,8 @@ def render_vitamin_kinetics():
             sources = get_food_sources_for_vitamin(sel_vit)
             sel_source = st.selectbox("Select Food Matrix:", options=sources, key="rate_source")
 
-        entry = vit_df[vit_df["food_source"] == sel_source].iloc[0] if not vit_df.empty else df_kinetics.iloc[0]
+        sub_df = df_kinetics[(df_kinetics["vitamin"] == sel_vit) & (df_kinetics["food_source"] == sel_source)]
+        entry = sub_df.iloc[0] if not sub_df.empty else df_kinetics.iloc[0]
 
         temps = np.linspace(25.0, 115.0, 91)
         k_rates = calculate_arrhenius_k(temps, entry["A_per_min"], entry["Ea_J_mol"])
