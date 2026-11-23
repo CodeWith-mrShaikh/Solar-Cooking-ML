@@ -27,8 +27,7 @@ try:
         get_vitamins_for_food_source,
         get_kinetics_entry,
         FOOD_SOURCE_METADATA,
-        SOLAR_FOOD_METADATA,
-        SOLAR_TO_KINETICS_RECOMMENDATION
+        SOLAR_FOOD_METADATA
     )
     from src.validation import ValidationError
 except (ImportError, KeyError):
@@ -42,8 +41,7 @@ except (ImportError, KeyError):
         get_vitamins_for_food_source,
         get_kinetics_entry,
         FOOD_SOURCE_METADATA,
-        SOLAR_FOOD_METADATA,
-        SOLAR_TO_KINETICS_RECOMMENDATION
+        SOLAR_FOOD_METADATA
     )
     from validation import ValidationError
 
@@ -256,15 +254,6 @@ def render_prediction():
                 help=f"Vitamins measured in {selected_source}. Choose 'All Vitamins' to simulate every nutrient simultaneously.",
                 key="input_target_vit"
             )
-
-            # Auto-link note for potato, rice, and water
-            recom = SOLAR_TO_KINETICS_RECOMMENDATION.get(food_matrix)
-            if recom and recom.get("note"):
-                st.markdown(
-                    f"<div style='font-size: 0.8rem; color: #10b981; margin-top: 4px;'>"
-                    f"💡 <b>Correlation Note:</b> {recom['note']}</div>",
-                    unsafe_allow_html=True
-                )
 
             # Parameters summary preview
             src_meta = FOOD_SOURCE_METADATA.get(selected_source, {})
